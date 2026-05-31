@@ -1,825 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DEAGLE AIM TRAINER</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --bg:#080a0b;
-  --grid:#0f1214;
-  --orange:#ff6a00;
-  --red:#e63535;
-  --green:#39ff14;
-  --gray:#3a3f45;
-  --light:#c8cdd3;
-  --dim:#5a6068;
-}
-body{
-  background:var(--bg);
-  color:var(--light);
-  font-family:'Share Tech Mono',monospace;
-  overflow:hidden;
-  height:100vh;
-  width:100vw;
-  cursor:none;
-}
-#custom-cursor{
-  position:fixed;
-  pointer-events:none;
-  z-index:9999;
-  transform:translate(-50%,-50%);
-}
-#custom-cursor .dot{width:4px;height:4px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-#custom-cursor .line{position:absolute;background:rgba(255,255,255,0.8);}
-#custom-cursor .t{width:1px;height:10px;top:-16px;left:50%;transform:translateX(-50%);}
-#custom-cursor .b{width:1px;height:10px;bottom:-16px;left:50%;transform:translateX(-50%);}
-#custom-cursor .l{height:1px;width:10px;left:-16px;top:50%;transform:translateY(-50%);}
-#custom-cursor .r{height:1px;width:10px;right:-16px;top:50%;transform:translateY(-50%);}
-#custom-cursor .circle{width:22px;height:22px;border:1px solid rgba(255,255,255,0.4);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EGOIST - Isagi Yoichi Cinematic Intro</title>
+    <!-- Google Fonts for premium cinematic look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Montserrat:ital,wght@0,300;0,400;0,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #00f0ff;
+            --dark-blue: #006680;
+            --aura-glow: rgba(0, 240, 255, 0.4);
+            --bg-dark: #020306;
+            --overlay-vignette: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(2, 3, 6, 0.92) 85%);
+            --font-cinematic: 'Cinzel', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
 
-#grid-bg{
-  position:fixed;inset:0;
-  background-image:
-    linear-gradient(rgba(255,106,0,0.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,106,0,0.03) 1px,transparent 1px);
-  background-size:40px 40px;
-  z-index:0;
-}
-#vignette{
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.85) 100%);
-  pointer-events:none;z-index:1;
-}
-#muzzle-flash{
-  position:fixed;inset:0;
-  background:rgba(255,220,100,0);
-  pointer-events:none;z-index:100;
-  transition:background 0s;
-}
-#shake-wrapper{position:fixed;inset:0;z-index:2;}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
 
-/* ===== SCREENS ===== */
-.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.hidden{display:none!important;}
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: var(--font-body);
+            color: #fff;
+        }
 
-/* MENU */
-#menu{background:var(--bg);}
-#menu h1{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(48px,8vw,96px);
-  letter-spacing:0.08em;
-  color:#fff;
-  text-shadow:0 0 40px rgba(255,106,0,0.5);
-  margin-bottom:4px;
-}
-#menu .sub{font-size:12px;letter-spacing:0.3em;color:var(--orange);margin-bottom:48px;text-transform:uppercase;}
-.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:min(700px,90vw);margin-bottom:40px;}
-.mode-card{
-  background:#0e1113;
-  border:1px solid var(--gray);
-  border-radius:4px;
-  padding:20px 24px;
-  cursor:none;
-  transition:border-color 0.15s,transform 0.1s;
-  position:relative;
-  overflow:hidden;
-}
-.mode-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,106,0,0.05),transparent);
-  opacity:0;transition:opacity 0.2s;
-}
-.mode-card:hover{border-color:var(--orange);transform:translateY(-2px);}
-.mode-card:hover::before{opacity:1;}
-.mode-card h2{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;color:#fff;margin-bottom:4px;}
-.mode-card p{font-size:11px;color:var(--dim);line-height:1.5;margin-bottom:16px;}
-.mode-card .tag{font-size:10px;color:var(--orange);letter-spacing:0.15em;margin-bottom:12px;display:block;}
-.btn{
-  background:transparent;
-  border:1px solid var(--orange);
-  color:var(--orange);
-  font-family:'Share Tech Mono',monospace;
-  font-size:12px;
-  letter-spacing:0.15em;
-  padding:8px 20px;
-  cursor:none;
-  transition:background 0.15s,color 0.15s;
-}
-.btn:hover{background:var(--orange);color:#000;}
-.btn-ghost{border-color:var(--gray);color:var(--light);}
-.btn-ghost:hover{background:var(--gray);color:#fff;}
-#scores-bar{
-  display:flex;gap:32px;
-  font-size:11px;color:var(--dim);
-  border-top:1px solid #1a1e22;
-  padding-top:16px;
-}
-#scores-bar span{color:var(--orange);}
+        /* --- FULLSCREEN SCENE CONTAINER --- */
+        #scene-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-/* HUD */
-#hud{
-  position:fixed;top:0;left:0;right:0;
-  height:56px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 24px;
-  background:rgba(8,10,11,0.9);
-  border-bottom:1px solid #1a1e22;
-  z-index:20;
-  pointer-events:none;
-}
-#hud-mode{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:0.1em;}
-#hud-score{font-size:22px;color:#fff;font-family:'Bebas Neue',sans-serif;}
-#hud-timer{font-family:'Bebas Neue',sans-serif;font-size:40px;color:#fff;letter-spacing:0.05em;transition:color 0.3s;}
-#hud-timer.urgent{color:var(--red);}
-#hud-acc{font-size:13px;color:var(--dim);}
-#hud-acc span{color:var(--light);}
-#ammo-bar{display:flex;gap:4px;align-items:center;}
-.bullet-icon{
-  width:8px;height:20px;
-  background:var(--orange);
-  border-radius:4px 4px 1px 1px;
-  transition:opacity 0.1s,transform 0.1s;
-}
-.bullet-icon.spent{opacity:0.15;transform:scaleY(0.6);}
-#reload-text{font-size:10px;color:var(--orange);letter-spacing:0.2em;margin-left:8px;opacity:0;transition:opacity 0.2s;}
+        /* --- BACKGROUND VIDEO PLAYER --- */
+        .video-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: 1;
+        }
 
-/* GAME CANVAS */
-#game-area{
-  position:fixed;inset:0;
-  z-index:5;
-  overflow:hidden;
-}
-.target{
-  position:absolute;
-  border-radius:50%;
-  transform:translate(-50%,-50%) scale(0);
-  transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1);
-  cursor:none;
-  pointer-events:auto;
-}
-.target.alive{transform:translate(-50%,-50%) scale(1);}
-.target canvas{display:block;}
+        /* --- CINEMATIC DARK OVERLAY --- */
+        .cinematic-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay-vignette);
+            z-index: 2;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+        }
 
-.particle{
-  position:absolute;
-  width:5px;height:5px;
-  border-radius:50%;
-  pointer-events:none;
-}
-.bullet-hole{
-  position:absolute;
-  width:8px;height:8px;
-  background:radial-gradient(circle,#000 30%,rgba(80,40,40,0.6) 60%,transparent 100%);
-  border-radius:50%;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
-  opacity:0.7;
-}
+        .cinematic-overlay.fade-out {
+            opacity: 0.3; /* Stays slightly dimmed for text readability */
+        }
 
-/* RESULTS */
-#results{background:var(--bg);}
-#results h1{font-family:'Bebas Neue',sans-serif;font-size:56px;color:#fff;letter-spacing:0.1em;margin-bottom:8px;}
-#new-hs{
-  font-size:12px;letter-spacing:0.3em;color:gold;
-  margin-bottom:32px;
-  opacity:0;transition:opacity 0.5s;
-  text-transform:uppercase;
-}
-#new-hs.show{opacity:1;}
-.result-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
-  width:min(560px,90vw);margin-bottom:40px;
-}
-.stat-box{
-  background:#0e1113;
-  border:1px solid var(--gray);
-  border-radius:4px;
-  padding:16px;
-  text-align:center;
-}
-.stat-box .val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;}
-.stat-box .lbl{font-size:10px;color:var(--dim);letter-spacing:0.15em;margin-top:4px;}
-#grade-box{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--orange);margin-bottom:16px;}
-.result-btns{display:flex;gap:16px;}
+        /* --- INTRO / START OVERLAY MENU --- */
+        #intro-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 3, 6, 0.85); /* Dark screen overlay before start */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-/* PRECISION COUNTER */
-#precision-hud{
-  position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
-  font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--dim);
-  z-index:20;pointer-events:none;letter-spacing:0.1em;
-}
-#precision-hud span{color:#fff;}
+        #intro-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-/* ENDURANCE WARNING */
-#endurance-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  height:4px;background:var(--red);
-  z-index:20;
-  transform-origin:left;
-  transition:transform 0.05s linear;
-}
+        .overlay-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
 
-</style>
+        /* Puzzle Piece Emblem (Original SVG Isagi Yoichi motif) */
+        .intro-emblem {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 25px;
+            fill: var(--primary-blue);
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45));
+            animation: emblem-pulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes emblem-pulse {
+            0% { transform: scale(1.0); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.65)); }
+            100% { transform: scale(1.0); }
+        }
+
+        .intro-title {
+            font-family: var(--font-cinematic);
+            font-size: 2.5rem;
+            letter-spacing: 6px;
+            margin-bottom: 10px;
+            background: linear-gradient(180deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .intro-desc {
+            font-size: 0.85rem;
+            color: #8fa0cc;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Cinematic Start Button */
+        .btn-cinematic {
+            font-family: var(--font-cinematic);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            padding: 15px 45px;
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-cinematic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-cinematic:hover {
+            background-color: var(--primary-blue);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.45);
+            color: #000;
+            transform: scale(1.05);
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-cinematic:hover::before {
+            left: 100%;
+        }
+
+        .btn-cinematic:active {
+            transform: scale(0.98);
+        }
+
+        /* --- LOADING SCREEN --- */
+        #loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 1s ease;
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: var(--font-cinematic);
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: #8fa0cc;
+            text-transform: uppercase;
+        }
+
+        /* --- HUD / TYPOGRAPHY LAYER --- */
+        #layer-hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .cinematic-text-box {
+            margin-top: -12%;
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 2.5s cubic-bezier(0.1, 0.8, 0.3, 1), transform 2.5s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        .cinematic-text-box.reveal {
+            opacity: 1.0;
+            transform: translateY(0);
+        }
+
+        .main-title {
+            font-family: var(--font-cinematic);
+            font-size: 5.2rem;
+            font-weight: 900;
+            letter-spacing: 16px;
+            background: linear-gradient(180deg, #ffffff 40%, rgba(0, 240, 255, 0.5) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            text-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 20px rgba(0, 240, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .main-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-blue), transparent);
+            margin: 15px auto 0 auto;
+            box-shadow: 0 0 10px var(--primary-blue);
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            font-weight: 300;
+            color: #b0c2e6;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+            max-width: 750px;
+            line-height: 1.6;
+        }
+
+        /* --- FALLBACK ERROR TEXT --- */
+        .video-fallback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 0;
+            width: 85%;
+        }
+
+        .video-fallback p {
+            font-size: 1.1rem;
+            color: #8fa0cc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1.6;
+        }
+
+        /* --- RESPONSIVE ADAPTABILITY --- */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.8rem;
+                letter-spacing: 8px;
+            }
+            .subtitle {
+                font-size: 0.85rem;
+                letter-spacing: 4px;
+                max-width: 90%;
+            }
+            .intro-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div id="scene-container">
+        <!-- FALLBACK TEXT: Displayed if the background video cannot load or play -->
+        <div class="video-fallback">
+            <p>Egoist Awakening...<br>[ Background cinematic video is loading or unsupported ]</p>
+        </div>
 
-<div id="grid-bg"></div>
-<div id="vignette"></div>
-<div id="muzzle-flash"></div>
-<div id="custom-cursor">
-  <div class="circle"></div>
-  <div class="dot"></div>
-  <div class="line t"></div>
-  <div class="line b"></div>
-  <div class="line l"></div>
-  <div class="line r"></div>
-</div>
+        <!-- BACKGROUND VIDEO PLAYER -->
+        <!-- NOTE: CHANGE THE VIDEO SOURCE PATH BELOW (src="assets/isagi.mp4") IF YOUR ASSET FILE CHANGES -->
+        <video class="video-background" id="bg-video" autoplay muted loop playsinline preload="auto">
+            <source src="assets/isagi.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 
-<!-- MENU -->
-<div id="menu" class="screen">
-  <h1>DEAGLE AIM TRAINER</h1>
-  <div class="sub">Desert Eagle · Precision Training System</div>
-  <div class="mode-grid">
-    <div class="mode-card" onclick="startGame('classic')">
-      <span class="tag">● TIMED · 60s</span>
-      <h2>Classic</h2>
-      <p>Standard aim training. Hit as many targets as possible in 60 seconds.</p>
-      <button class="btn">SELECT</button>
+        <!-- CINEMATIC DARK OVERLAY: Provides dark radial vignette for contrast -->
+        <div class="cinematic-overlay"></div>
+
+        <!-- HUD / TYPOGRAPHY LAYER: Displays EGOIST title overlay -->
+        <div id="layer-hud">
+            <div class="cinematic-text-box" id="hud-text">
+                <h1 class="main-title">Egoist</h1>
+                <p class="subtitle">Devour the field. True genius is born from absolute ego.</p>
+            </div>
+        </div>
+
+        <!-- START SCENE MENU OVERLAY -->
+        <div id="intro-overlay">
+            <div class="overlay-card">
+                <!-- SVG Puzzle Piece Emblem -->
+                <svg class="intro-emblem" viewBox="0 0 100 100">
+                    <path d="M 20 20 H 45 C 45 10, 55 10, 55 20 H 80 V 45 C 90 45, 90 55, 80 55 V 80 H 55 C 55 70, 45 70, 45 80 H 20 V 55 C 30 55, 30 45, 20 45 Z" />
+                </svg>
+                <h2 class="intro-title">Egoist Awakening</h2>
+                <p class="intro-desc">Witness the evaluation of Isagi Yoichi as he devours the field</p>
+                <button class="btn-cinematic" id="btn-start" onclick="triggerStartScene()">Start Scene</button>
+            </div>
+        </div>
+
+        <!-- LOADING SCREEN: Monitors video loading before displaying start menu -->
+        <div id="loading-screen">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading Cinematic...</div>
+        </div>
+
+        <!-- OPTIONAL BACKGROUND AUDIO SUPPORT (Commented out as requested) -->
+        <!--
+        <audio id="bg-audio" loop preload="auto">
+            <source src="assets/cinematic_audio.mp3" type="audio/mpeg">
+        </audio>
+        -->
     </div>
-    <div class="mode-card" onclick="startGame('speed')">
-      <span class="tag">● SPEED · 30s</span>
-      <h2>Speed Demon</h2>
-      <p>Small, fast-disappearing targets. Pure flick accuracy under pressure.</p>
-      <button class="btn">SELECT</button>
-    </div>
-    <div class="mode-card" onclick="startGame('precision')">
-      <span class="tag">● ACCURACY · 10 TARGETS</span>
-      <h2>Precision</h2>
-      <p>10 targets, no timer. Your accuracy percentage earns a grade.</p>
-      <button class="btn">SELECT</button>
-    </div>
-    <div class="mode-card" onclick="startGame('endurance')">
-      <span class="tag">● SURVIVAL</span>
-      <h2>Endurance</h2>
-      <p>Targets shrink and spawn faster every 10 hits. Survive as long as you can.</p>
-      <button class="btn">SELECT</button>
-    </div>
-  </div>
-  <div id="scores-bar">
-    <div>CLASSIC: <span id="hs-classic">---</span></div>
-    <div>SPEED: <span id="hs-speed">---</span></div>
-    <div>PRECISION: <span id="hs-precision">---</span>%</div>
-    <div>ENDURANCE: <span id="hs-endurance">---</span></div>
-  </div>
-</div>
 
-<!-- HUD -->
-<div id="hud" class="hidden">
-  <div>
-    <div id="hud-mode">CLASSIC</div>
-    <div id="hud-score">0</div>
-  </div>
-  <div id="hud-timer">60</div>
-  <div style="text-align:right">
-    <div id="hud-acc">ACC <span id="hud-acc-val">100%</span></div>
-    <div id="ammo-bar">
-      <div class="bullet-icon" id="b0"></div>
-      <div class="bullet-icon" id="b1"></div>
-      <div class="bullet-icon" id="b2"></div>
-      <div class="bullet-icon" id="b3"></div>
-      <div class="bullet-icon" id="b4"></div>
-      <div class="bullet-icon" id="b5"></div>
-      <div class="bullet-icon" id="b6"></div>
-      <div id="reload-text">RELOAD</div>
-    </div>
-  </div>
-</div>
+    <script>
+        const video = document.getElementById('bg-video');
+        const loadingScreen = document.getElementById('loading-screen');
+        const introOverlay = document.getElementById('intro-overlay');
+        const cinematicOverlay = document.querySelector('.cinematic-overlay');
+        const hudText = document.getElementById('hud-text');
 
-<!-- GAME AREA -->
-<div id="game-area" class="hidden" onclick="handleGameClick(event)"></div>
-<div id="precision-hud" class="hidden">TARGET <span id="prec-count">1</span>/10</div>
-<div id="endurance-bar" class="hidden"></div>
+        // Optional Audio DOM handle (commented out in HTML but cached in code)
+        // const audio = document.getElementById('bg-audio');
 
-<!-- RESULTS -->
-<div id="results" class="screen hidden">
-  <h1 id="result-title">ROUND OVER</h1>
-  <div id="new-hs">★ NEW HIGH SCORE ★</div>
-  <div id="grade-box" class="hidden"></div>
-  <div class="result-grid">
-    <div class="stat-box"><div class="val" id="r-score">0</div><div class="lbl">SCORE</div></div>
-    <div class="stat-box"><div class="val" id="r-acc">0%</div><div class="lbl">ACCURACY</div></div>
-    <div class="stat-box"><div class="val" id="r-shots">0</div><div class="lbl">SHOTS</div></div>
-    <div class="stat-box"><div class="val" id="r-hits">0</div><div class="lbl">HITS</div></div>
-    <div class="stat-box"><div class="val" id="r-miss">0</div><div class="lbl">MISSES</div></div>
-    <div class="stat-box"><div class="val" id="r-react">0ms</div><div class="lbl">AVG REACTION</div></div>
-  </div>
-  <div class="result-btns">
-    <button class="btn" onclick="startGame(currentMode)">PLAY AGAIN</button>
-    <button class="btn btn-ghost" onclick="showMenu()">MAIN MENU</button>
-  </div>
-</div>
+        // --- HANDLE VIDEO PRELOADING & LOADING SCREEN ---
+        // Hide loading screen once video is buffered and ready to play smoothly
+        function videoIsReady() {
+            loadingScreen.classList.add('fade-out');
+        }
 
-<div id="shake-wrapper"></div>
+        // Check if video is already buffered on load
+        if (video.readyState >= 3) {
+            videoIsReady();
+        } else {
+            // Monitor loading events
+            video.addEventListener('canplaythrough', videoIsReady);
+            video.addEventListener('loadeddata', videoIsReady);
+        }
 
-<script>
-// ===== AUDIO ENGINE =====
-const AC = new (window.AudioContext || window.webkitAudioContext)();
+        // Fallback safety timeout: Hide loading screen after 6 seconds even if video load stalls
+        setTimeout(() => {
+            if (!loadingScreen.classList.contains('fade-out')) {
+                console.warn("Video loading timed out or failed. Displaying fallback.");
+                videoIsReady();
+            }
+        }, 6000);
 
-function playShot(){
-  const t = AC.currentTime;
-  // Low thump
-  const osc = AC.createOscillator();
-  const gain = AC.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(90, t);
-  osc.frequency.exponentialRampToValueAtTime(30, t + 0.3);
-  gain.gain.setValueAtTime(1.2, t);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-  osc.connect(gain); gain.connect(AC.destination);
-  osc.start(t); osc.stop(t + 0.45);
+        // --- START SCENE EVENT TRIGGER ---
+        function triggerStartScene() {
+            // Hide the Start Menu Overlay
+            introOverlay.classList.add('hidden');
 
-  // Crack (noise)
-  const bufLen = AC.sampleRate * 0.08;
-  const buf = AC.createBuffer(1, bufLen, AC.sampleRate);
-  const d = buf.getChannelData(0);
-  for(let i=0;i<bufLen;i++) d[i]=(Math.random()*2-1);
-  const src = AC.createBufferSource();
-  src.buffer = buf;
-  const filter = AC.createBiquadFilter();
-  filter.type = 'highpass'; filter.frequency.value = 2000;
-  const ng = AC.createGain();
-  ng.gain.setValueAtTime(0.8, t);
-  ng.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-  src.connect(filter); filter.connect(ng); ng.connect(AC.destination);
-  src.start(t);
+            // Apply fade-out styling to cinematic overlay for maximum video visibility
+            if (cinematicOverlay) {
+                cinematicOverlay.classList.add('fade-out');
+            }
 
-  // Reverb tail
-  const rl = AC.sampleRate * 0.6;
-  const rb = AC.createBuffer(1, rl, AC.sampleRate);
-  const rd = rb.getChannelData(0);
-  for(let i=0;i<rl;i++) rd[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*0.15));
-  const rs = AC.createBufferSource(); rs.buffer = rb;
-  const rg = AC.createGain(); rg.gain.value = 0.15;
-  rs.connect(rg); rg.connect(AC.destination);
-  rs.start(t+0.02);
-}
+            // Play background video from the beginning
+            video.currentTime = 0;
+            const playPromise = video.play();
 
-function playMiss(){
-  const t = AC.currentTime;
-  const bl = AC.sampleRate*0.04;
-  const b = AC.createBuffer(1,bl,AC.sampleRate);
-  const d = b.getChannelData(0);
-  for(let i=0;i<bl;i++) d[i]=(Math.random()*2-1)*0.3;
-  const s = AC.createBufferSource(); s.buffer=b;
-  const g = AC.createGain(); g.gain.setValueAtTime(0.3,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.04);
-  s.connect(g); g.connect(AC.destination); s.start(t);
-}
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error("Autoplay/play was prevented by browser security rules:", error);
+                });
+            }
 
-function playHit(){
-  const t = AC.currentTime;
-  const o = AC.createOscillator(); const g = AC.createGain();
-  o.frequency.value = 900; o.type = 'sine';
-  g.gain.setValueAtTime(0.15,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1);
-  o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+0.1);
-}
+            // Fade in the EGOIST title overlay with transition
+            setTimeout(() => {
+                hudText.classList.add('reveal');
+            }, 1000);
 
-function playReload(){
-  const t = AC.currentTime;
-  [0, 0.12].forEach((delay, i) => {
-    const o = AC.createOscillator(); const g = AC.createGain();
-    o.frequency.value = i===0 ? 400 : 600; o.type = 'square';
-    g.gain.setValueAtTime(0.1,t+delay); g.gain.exponentialRampToValueAtTime(0.001,t+delay+0.06);
-    o.connect(g); g.connect(AC.destination); o.start(t+delay); o.stop(t+delay+0.06);
-  });
-}
-
-// ===== STATE =====
-let currentMode = 'classic';
-let score = 0, shots = 0, hits = 0;
-let timeLeft = 60;
-let gameActive = false;
-let timerInterval = null;
-let ammoLeft = 7;
-let reloading = false;
-let activeTargets = [];
-let reactionTimes = [];
-let lastTargetSpawn = 0;
-let enduranceLevel = 0;
-let precisionTargetsLeft = 10;
-let enduranceTimer = null;
-let enduranceBarTimer = null;
-let enduranceExpireTime = 0;
-
-const MODES = {
-  classic: {label:'CLASSIC', time:60, targetSize:[35,50], lifespan:2500, spawnRate:800},
-  speed:   {label:'SPEED DEMON', time:30, targetSize:[22,34], lifespan:800, spawnRate:500},
-  precision:{label:'PRECISION', time:0, targetSize:[28,36], lifespan:0, spawnRate:0},
-  endurance:{label:'ENDURANCE', time:0, targetSize:[40,54], lifespan:2000, spawnRate:900}
-};
-
-// ===== CURSOR =====
-const cursor = document.getElementById('custom-cursor');
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-});
-
-// ===== HIGH SCORES =====
-function getHS(mode){ return localStorage.getItem('hs_'+mode) || null; }
-function setHS(mode, val){ localStorage.setItem('hs_'+mode, val); }
-function updateScoreDisplay(){
-  ['classic','speed','precision','endurance'].forEach(m => {
-    const v = getHS(m);
-    const el = document.getElementById('hs-'+m);
-    if(el) el.textContent = v !== null ? v : '---';
-  });
-}
-updateScoreDisplay();
-
-// ===== SCREENS =====
-function showMenu(){
-  stopGame();
-  hide('hud'); hide('game-area'); hide('results'); hide('precision-hud'); hide('endurance-bar');
-  show('menu');
-  updateScoreDisplay();
-}
-
-function show(id){ document.getElementById(id).classList.remove('hidden'); }
-function hide(id){ document.getElementById(id).classList.add('hidden'); }
-
-// ===== GAME START =====
-function startGame(mode){
-  if(AC.state === 'suspended') AC.resume();
-  stopGame();
-  currentMode = mode;
-  score = 0; shots = 0; hits = 0; reactionTimes = [];
-  ammoLeft = 7; reloading = false;
-  activeTargets = [];
-  precisionTargetsLeft = 10;
-  enduranceLevel = 0;
-
-  const cfg = MODES[mode];
-  timeLeft = cfg.time;
-
-  hide('menu'); hide('results');
-  show('hud'); show('game-area');
-  document.getElementById('hud-mode').textContent = cfg.label;
-  updateHUD();
-  updateAmmo();
-
-  document.getElementById('game-area').innerHTML = '';
-
-  if(mode === 'precision'){
-    show('precision-hud');
-    document.getElementById('prec-count').textContent = '1';
-    document.getElementById('hud-timer').textContent = '∞';
-    hide('endurance-bar');
-    gameActive = true;
-    spawnTarget();
-  } else if(mode === 'endurance'){
-    hide('precision-hud');
-    show('endurance-bar');
-    gameActive = true;
-    startTimer();
-    scheduleEnduranceTarget();
-  } else {
-    hide('precision-hud'); hide('endurance-bar');
-    gameActive = true;
-    startTimer();
-    startSpawner();
-  }
-}
-
-function stopGame(){
-  gameActive = false;
-  clearInterval(timerInterval);
-  clearTimeout(enduranceTimer);
-  clearTimeout(enduranceBarTimer);
-  activeTargets.forEach(t => { if(t.el && t.el.parentNode) t.el.parentNode.removeChild(t.el); if(t.timeout) clearTimeout(t.timeout); });
-  activeTargets = [];
-  if(spawnerTimeout) clearTimeout(spawnerTimeout);
-  spawnerTimeout = null;
-}
-
-let spawnerTimeout = null;
-function startSpawner(){
-  const cfg = MODES[currentMode];
-  const rate = cfg.spawnRate;
-  function spawn(){
-    if(!gameActive) return;
-    spawnTarget();
-    const jitter = rate * 0.3;
-    spawnerTimeout = setTimeout(spawn, rate + (Math.random()-0.5)*jitter);
-  }
-  spawnerTimeout = setTimeout(spawn, 200);
-}
-
-function startTimer(){
-  timerInterval = setInterval(() => {
-    if(!gameActive) return;
-    if(currentMode !== 'endurance' && currentMode !== 'precision'){
-      timeLeft--;
-      const el = document.getElementById('hud-timer');
-      el.textContent = timeLeft;
-      el.classList.toggle('urgent', timeLeft <= 10);
-      if(timeLeft <= 0){ endGame(); }
-    }
-  }, 1000);
-}
-
-// ===== ENDURANCE =====
-function scheduleEnduranceTarget(){
-  if(!gameActive) return;
-  const cfg = MODES.endurance;
-  const rate = Math.max(300, cfg.spawnRate - enduranceLevel * 60);
-  spawnerTimeout = setTimeout(() => {
-    if(gameActive) spawnTarget();
-  }, rate);
-}
-
-function startEnduranceBar(lifespan){
-  const bar = document.getElementById('endurance-bar');
-  const start = performance.now();
-  enduranceExpireTime = start + lifespan;
-  function tick(){
-    if(!gameActive) return;
-    const now = performance.now();
-    const progress = Math.max(0, (enduranceExpireTime - now) / lifespan);
-    bar.style.transform = `scaleX(${progress})`;
-    if(progress > 0) enduranceBarTimer = requestAnimationFrame(tick);
-  }
-  enduranceBarTimer = requestAnimationFrame(tick);
-}
-
-// ===== TARGET =====
-function drawTargetCanvas(size){
-  const c = document.createElement('canvas');
-  c.width = size; c.height = size;
-  const ctx = c.getContext('2d');
-  const cx = size/2, r = size/2;
-  const rings = [[1,'#fff'],[0.7,'#e8e8e8'],[0.45,'#d0d0d0'],[0.25,'#ff3333']];
-  rings.forEach(([frac, col]) => {
-    ctx.beginPath();
-    ctx.arc(cx, cx, r*frac, 0, Math.PI*2);
-    ctx.fillStyle = col;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-  });
-  ctx.beginPath(); ctx.arc(cx,cx,r*0.08,0,Math.PI*2);
-  ctx.fillStyle = '#111'; ctx.fill();
-  return c;
-}
-
-function spawnTarget(){
-  if(!gameActive) return;
-  const cfg = MODES[currentMode];
-  const [minS, maxS] = cfg.targetSize;
-  let size;
-  if(currentMode === 'endurance'){
-    size = Math.max(20, maxS - enduranceLevel * 3);
-  } else {
-    size = minS + Math.random()*(maxS-minS);
-  }
-
-  const area = document.getElementById('game-area');
-  const W = window.innerWidth, H = window.innerHeight;
-  const pad = size;
-  const x = pad + Math.random()*(W - 2*pad);
-  const y = 70 + Math.random()*(H - 70 - pad*2);
-
-  const el = document.createElement('div');
-  el.className = 'target';
-  el.style.left = x+'px'; el.style.top = y+'px';
-  el.style.width = size+'px'; el.style.height = size+'px';
-
-  const c = drawTargetCanvas(size);
-  el.appendChild(c);
-  area.appendChild(el);
-
-  requestAnimationFrame(() => el.classList.add('alive'));
-
-  const spawnTime = performance.now();
-  const tData = { el, x, y, size, spawnTime, timeout: null };
-
-  if(currentMode === 'precision'){
-    // no auto-expire
-  } else {
-    let lifespan = cfg.lifespan;
-    if(currentMode === 'endurance') lifespan = Math.max(600, 2000 - enduranceLevel*100);
-    if(currentMode === 'endurance') startEnduranceBar(lifespan);
-
-    tData.timeout = setTimeout(() => {
-      if(!gameActive) return;
-      if(activeTargets.includes(tData)){
-        expireTarget(tData);
-        if(currentMode === 'endurance'){ endGame(); return; }
-      }
-    }, lifespan);
-  }
-
-  activeTargets.push(tData);
-}
-
-function expireTarget(tData){
-  removeTarget(tData);
-  const el = tData.el;
-  if(!el) return;
-  el.style.filter = 'hue-rotate(0deg) brightness(5)';
-  el.style.opacity = '0';
-  el.style.transition = 'opacity 0.15s, filter 0.15s';
-  setTimeout(() => el.parentNode && el.parentNode.removeChild(el), 200);
-}
-
-function removeTarget(tData){
-  const idx = activeTargets.indexOf(tData);
-  if(idx !== -1) activeTargets.splice(idx, 1);
-  if(tData.timeout) clearTimeout(tData.timeout);
-}
-
-// ===== CLICK HANDLING =====
-function handleGameClick(e){
-  if(!gameActive || reloading) return;
-  if(AC.state === 'suspended') AC.resume();
-
-  const target = e.target.closest('.target');
-  shots++;
-  doShot();
-
-  if(target){
-    const tData = activeTargets.find(t => t.el === target);
-    if(tData){
-      hits++;
-      const rt = performance.now() - tData.spawnTime;
-      reactionTimes.push(rt);
-      removeTarget(tData);
-      hitEffect(tData.x, tData.y, tData.size);
-      playHit();
-      score++;
-
-      if(currentMode === 'endurance'){
-        if(hits % 10 === 0) enduranceLevel++;
-        scheduleEnduranceTarget();
-      } else if(currentMode === 'precision'){
-        precisionTargetsLeft--;
-        const remaining = 10 - hits;
-        document.getElementById('prec-count').textContent = hits+1 > 10 ? 10 : hits+1;
-        if(hits >= 10){ setTimeout(endGame, 300); return; }
-        setTimeout(spawnTarget, 300);
-      }
-      updateHUD();
-    }
-  } else {
-    playMiss();
-    bulletHoleEffect(e.clientX, e.clientY);
-    updateHUD();
-  }
-}
-
-function doShot(){
-  ammoLeft--;
-  updateAmmo();
-  playShot();
-  muzzleFlash();
-  screenShake();
-
-  if(ammoLeft <= 0 && !reloading){
-    reloading = true;
-    document.getElementById('reload-text').style.opacity = '1';
-    setTimeout(() => {
-      ammoLeft = 7;
-      reloading = false;
-      playReload();
-      document.getElementById('reload-text').style.opacity = '0';
-      updateAmmo();
-    }, 600);
-  }
-}
-
-function muzzleFlash(){
-  const fl = document.getElementById('muzzle-flash');
-  fl.style.background = 'rgba(255,220,100,0.12)';
-  setTimeout(() => fl.style.background = 'rgba(255,220,100,0)', 80);
-}
-
-function screenShake(){
-  const w = document.getElementById('game-area');
-  const dx = (Math.random()-0.5)*6, dy = (Math.random()-0.5)*6;
-  w.style.transform = `translate(${dx}px,${dy}px)`;
-  setTimeout(() => w.style.transform = '', 100);
-}
-
-// ===== EFFECTS =====
-function hitEffect(x, y, size){
-  const area = document.getElementById('game-area');
-  const colors = ['#ff6a00','#ffb347','#ffffff','#ff3333','#ffdd57'];
-  for(let i=0;i<10;i++){
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const angle = (i/10)*Math.PI*2;
-    const speed = 40 + Math.random()*60;
-    const col = colors[Math.floor(Math.random()*colors.length)];
-    p.style.cssText = `left:${x}px;top:${y}px;background:${col};transform:translate(-50%,-50%);transition:all 0.4s ease-out;opacity:1;`;
-    area.appendChild(p);
-    requestAnimationFrame(() => {
-      p.style.left = (x + Math.cos(angle)*speed)+'px';
-      p.style.top = (y + Math.sin(angle)*speed)+'px';
-      p.style.opacity = '0';
-      p.style.transform = 'translate(-50%,-50%) scale(0.3)';
-    });
-    setTimeout(() => p.parentNode && p.parentNode.removeChild(p), 450);
-  }
-  // Remove target DOM
-  const tData = activeTargets.find(t => t.x === x && t.y === y);
-  // find by proximity
-  const closest = activeTargets.find(t => Math.abs(t.x-x)<2 && Math.abs(t.y-y)<2);
-  // just clean up by checking area children
-  area.querySelectorAll('.target.alive').forEach(el => {
-    const ex = parseFloat(el.style.left), ey = parseFloat(el.style.top);
-    if(Math.abs(ex-x)<3 && Math.abs(ey-y)<3){
-      el.style.transform = 'translate(-50%,-50%) scale(0)';
-      setTimeout(() => el.parentNode && el.parentNode.removeChild(el), 150);
-    }
-  });
-}
-
-function bulletHoleEffect(x, y){
-  const area = document.getElementById('game-area');
-  const h = document.createElement('div');
-  h.className = 'bullet-hole';
-  h.style.left = x+'px'; h.style.top = y+'px';
-  area.appendChild(h);
-  setTimeout(() => {
-    h.style.transition = 'opacity 1s';
-    h.style.opacity = '0';
-    setTimeout(() => h.parentNode && h.parentNode.removeChild(h), 1100);
-  }, 2000);
-}
-
-// ===== HUD =====
-function updateHUD(){
-  document.getElementById('hud-score').textContent = score;
-  const acc = shots > 0 ? Math.round(hits/shots*100) : 100;
-  document.getElementById('hud-acc-val').textContent = acc+'%';
-}
-
-function updateAmmo(){
-  for(let i=0;i<7;i++){
-    document.getElementById('b'+i).classList.toggle('spent', i >= ammoLeft);
-  }
-}
-
-// ===== END GAME =====
-function endGame(){
-  gameActive = false;
-  clearInterval(timerInterval);
-  clearTimeout(spawnerTimeout);
-  activeTargets.forEach(t => { if(t.timeout) clearTimeout(t.timeout); if(t.el && t.el.parentNode) { t.el.style.opacity='0'; setTimeout(()=>t.el.parentNode&&t.el.parentNode.removeChild(t.el),200); }});
-  activeTargets = [];
-
-  hide('hud'); hide('game-area'); hide('precision-hud'); hide('endurance-bar');
-  show('results');
-
-  const acc = shots > 0 ? Math.round(hits/shots*100) : 0;
-  const avgRT = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0)/reactionTimes.length) : 0;
-
-  document.getElementById('r-score').textContent = score;
-  document.getElementById('r-acc').textContent = acc+'%';
-  document.getElementById('r-shots').textContent = shots;
-  document.getElementById('r-hits').textContent = hits;
-  document.getElementById('r-miss').textContent = shots - hits;
-  document.getElementById('r-react').textContent = avgRT ? avgRT+'ms' : '--';
-
-  const gb = document.getElementById('grade-box');
-  if(currentMode === 'precision'){
-    document.getElementById('result-title').textContent = 'PRECISION REPORT';
-    gb.classList.remove('hidden');
-    const grade = acc>=95?'S':acc>=80?'A':acc>=65?'B':acc>=50?'C':'F';
-    gb.textContent = grade;
-    gb.style.color = acc>=95?'gold':acc>=80?'#39ff14':acc>=65?'#ff6a00':acc>=50?'#c8cdd3':'#e63535';
-  } else {
-    gb.classList.add('hidden');
-    document.getElementById('result-title').textContent = 'ROUND OVER';
-  }
-
-  const hsKey = currentMode === 'precision' ? acc : score;
-  const prev = getHS(currentMode);
-  const nhsEl = document.getElementById('new-hs');
-  if(prev === null || hsKey > parseInt(prev)){
-    setHS(currentMode, hsKey);
-    nhsEl.classList.add('show');
-  } else {
-    nhsEl.classList.remove('show');
-  }
-  updateScoreDisplay();
-}
-
-// Init
-showMenu();
-</script>
+            // Optional background audio play handle (commented out)
+            /*
+            if (audio) {
+                audio.volume = 0.5;
+                audio.play().catch(err => console.log("Audio autoplay prevented:", err));
+            }
+            */
+        }
+    </script>
 </body>
 </html>
